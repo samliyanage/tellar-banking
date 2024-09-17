@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class EmployeeServiceImpl {
+public class EmployeeServiceImpl implements EmployeeService{
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -29,6 +29,7 @@ public class EmployeeServiceImpl {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Override
     public Employee registerEmployee(String email, String name, String companyName) {
         Company company = companyRepository.findByName(companyName)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
@@ -46,17 +47,20 @@ public class EmployeeServiceImpl {
         return employeeRepository.save(employee);
     }
 
-    public BigDecimal getEmployeeCredit(String email, String companyName) {
+    @Override
+    public BigDecimal getEmployeeCreditBalance(String email, String companyName) {
         Employee employee = employeeRepository.findByEmailAndCompany_Name(email, companyName)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         return employee.getCreditAccount().getCreditBalance();
     }
 
+    @Override
     public List<Employee> listEmployees(String companyName) {
         return employeeRepository.findByCompany_Name(companyName);
     }
 
-    public Employee updateCredit(String email, String companyName, BigDecimal newBalance) {
+    @Override
+    public Employee updateCreditBalance(String email, String companyName, BigDecimal newBalance) {
         Employee employee = employeeRepository.findByEmailAndCompany_Name(email, companyName)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
