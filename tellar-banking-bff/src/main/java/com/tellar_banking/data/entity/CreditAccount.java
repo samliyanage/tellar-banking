@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "CreditAccount")
+@Table(name = "credit_account")
 public class CreditAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

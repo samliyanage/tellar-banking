@@ -2,44 +2,52 @@ package com.tellar_banking.rest.controller;
 
 
 import com.tellar_banking.data.entity.Employee;
+import com.tellar_banking.rest.controller.handler.EmployeeBalanceResponse;
 import com.tellar_banking.rest.controller.handler.EmployeeRequest;
+import com.tellar_banking.rest.controller.handler.EmployeeResponse;
+import com.tellar_banking.rest.controller.handler.UpdateCreditRequest;
 import com.tellar_banking.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/tellar-banking/api/v1/employees")
+@RequestMapping("/teller-banking/api/v1/employees")
 public class EmployeeController {
+
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerEmployee(@RequestBody EmployeeRequest request) {
-        Employee employee = employeeService.registerEmployee(request.getEmail(), request.getName(), request.getCompany());
-        return ResponseEntity.ok(Map.of("success", true, "credit", employee.getCreditAccount().getCreditBalance()));
+    @PostMapping
+    public ResponseEntity<EmployeeResponse> registerEmployee(@RequestBody @Valid EmployeeRequest request) {
+        Employee employee = employeeService.createEmployee(request);
+        return new ResponseEntity<>(new EmployeeResponse(employee.getName(), employee.getCreditAccount().getCreditBalance()), HttpStatus.CREATED);
     }
 
-    @GetMapping("/credit-balance")
-    public ResponseEntity<?> getEmployeeCredit(@RequestParam String email, @RequestParam String company) {
-        BigDecimal credit = employeeService.getEmployeeCreditBalance(email, company);
-        return ResponseEntity.ok(Map.of("credit", credit));
+    @PostMapping("/credit-balance")
+    public ResponseEntity<EmployeeBalanceResponse> getEmployeeCreditBalance(@RequestBody @Valid EmployeeRequest request) {
+        BigDecimal credit = employeeService.getEmployeeCredit(request.getEmail(), request.getCompany());
+        return new ResponseEntity<>(new EmployeeBalanceResponse(credit), HttpStatus.OK);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<?> listEmployees(@RequestParam String company) {
-        List<Employee> employees = employeeService.listEmployees(company);
-        return ResponseEntity.ok(employees);
+    @GetMapping("/all")
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam("company_name") String companyName) {
+        List<Employee> employees = employeeService.getAllEmployeesForCompany(companyName);
+        List<EmployeeResponse> responses = employees.stream()
+                .map(employee -> new EmployeeResponse(employee.getName(), employee.getCreditAccount().getCreditBalance()))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     @PatchMapping("/credit-balance")
-    public ResponseEntity<?> updateEmployeeCredit(@RequestParam String email, @RequestParam String company, @RequestParam BigDecimal newBalance) {
-        Employee employee = employeeService.updateCreditBalance(email, company, newBalance);
-        return ResponseEntity.ok(employee);
+    public ResponseEntity<EmployeeResponse> updateEmployeeCredit(@RequestBody @Valid UpdateCreditRequest request) {
+        Employee employee = employeeService.updateEmployeeCredit(request.getEmail(), request.getCompany(), request.getNewCredit());
+        return new ResponseEntity<>(new EmployeeResponse(employee.getName(), employee.getCreditAccount().getCreditBalance()), HttpStatus.OK);
     }
 }
-
