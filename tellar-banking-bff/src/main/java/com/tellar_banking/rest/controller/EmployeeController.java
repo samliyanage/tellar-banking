@@ -37,7 +37,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam("company_name") String companyName) {
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam(name = "company_name", required = false) String companyName) {
         List<Employee> employees = employeeService.getAllEmployeesForCompany(companyName);
         List<EmployeeResponse> responses = employees.stream()
                 .map(employee -> new EmployeeResponse(employee.getName(), employee.getCreditAccount().getCreditBalance()))
