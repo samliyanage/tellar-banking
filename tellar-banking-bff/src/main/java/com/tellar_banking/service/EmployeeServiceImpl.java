@@ -8,7 +8,6 @@ import com.tellar_banking.data.repository.CreditAccountRepository;
 import com.tellar_banking.data.repository.EmployeeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,9 +24,6 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Autowired
     private CreditAccountRepository creditAccountRepository;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Employee registerEmployee(String email, String name, String companyName) {
