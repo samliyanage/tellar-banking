@@ -1,0 +1,30 @@
+
+-- Prerquisites, Postgre SQL DB
+
+--Table Creation
+CREATE TABLE company (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
+
+CREATE TABLE credit_account (
+    id BIGSERIAL PRIMARY KEY,
+    credit_balance DECIMAL(10, 2) NOT NULL
+);
+
+
+CREATE TABLE employee (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    company_id BIGSERIAL REFERENCES company(id) ON DELETE CASCADE,
+    account_id BIGSERIAL REFERENCES credit_account(id) ON DELETE CASCADE,
+    UNIQUE (email, company_id)
+);
+
+-- Insert Company Details
+INSERT INTO company (name) VALUES ('Apple');
+INSERT INTO company (name) VALUES ('Oracle');
+INSERT INTO company (name) VALUES ('Google');
+INSERT INTO company (name) VALUES ('Amazon');
